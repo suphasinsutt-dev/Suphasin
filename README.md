@@ -9,7 +9,7 @@ sudo apt install apache2 php libapache2-mod-php php-mysql -y
 sudo systemctl enable --now apache2
 
 =====================================
-2. RDS: connect from EC2 (replace ENDPOINT)
+2. RDS: connect from EC2 (replace ENDPOINT) ระหัสผ่าน Lab-password
 =====================================
 sudo apt install mysql-client -y
 mysql -h ENDPOINT -P 3306 -u admin -p
