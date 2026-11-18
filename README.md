@@ -1,2 +1,95 @@
 # Suphasin
-no
+MY ONLINE STORE - ALL CODE
+
+=====================================
+1. EC2: install web server (EC2 terminal)
+=====================================
+sudo apt update
+sudo apt install apache2 php libapache2-mod-php php-mysql -y
+sudo systemctl enable --now apache2
+
+=====================================
+2. RDS: connect from EC2 (replace ENDPOINT)
+=====================================
+sudo apt install mysql-client -y
+mysql -h ENDPOINT -P 3306 -u admin -p
+
+=====================================
+3. SQL (run at the mysql> prompt)
+=====================================
+CREATE DATABASE product_store;
+USE product_store;
+
+CREATE TABLE products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    price DECIMAL(10,2) NOT NULL
+);
+
+INSERT INTO products (name, price)
+VALUES
+('Stone Tee', 399.00),
+('Grey Tee', 399.00),
+('White Tee', 399.00);
+
+SELECT * FROM products;
+
+=====================================
+4. Config file (EC2 terminal)
+=====================================
+sudo mkdir -p /etc/my-online-store
+sudo nano /etc/my-online-store/config.php
+
+--- content of config.php (replace the password) ---
+<?php
+return [
+    'host' => 'my-online-store-d.cpkw6gkk2c5z.us-east-1.rds.amazonaws.com',
+    'database' => 'product_store',
+    'username' => 'admin',
+    'password' => 'YOUR-PASSWORD'
+];
+--- end of config.php ---
+
+sudo chown root:www-data /etc/my-online-store/config.php
+sudo chmod 640 /etc/my-online-store/config.php
+
+=====================================
+5. index.php (EC2 web page)
+=====================================
+sudo nano /var/www/html/index.php
+php -l /var/www/html/index.php
+sudo systemctl restart apache2
+
+NOTE: the full index.php code is NOT in this file.
+Copy it from your own PHP.php file.
+
+=====================================
+6. Amplify storefront: index.html
+(Zip it together with stone-shirt.png, grey-shirt.png and white-shirt.png
+at the first level of the ZIP. Replace YOUR-EC2-PUBLIC-IP.)
+NOTE: this is the simple version written earlier in this chat.
+Your deployed ZIP came from another source and may look different.
+=====================================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MY ONLINE STORE</title>
+<style>
+  body { font-family: sans-serif; margin: 0; padding: 24px; text-align: center; }
+  .grid { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .item img { width: 220px; height: 220px; object-fit: contain; }
+  a.btn { display: inline-block; margin-top: 24px; padding: 12px 20px; background: #111; color: #fff; text-decoration: none; border-radius: 6px; }
+</style>
+</head>
+<body>
+  <h1>MY ONLINE STORE</h1>
+  <div class="grid">
+    <div class="item"><img src="stone-shirt.png" alt="Stone Tee"><p>Stone Tee</p></div>
+    <div class="item"><img src="grey-shirt.png" alt="Grey Tee"><p>Grey Tee</p></div>
+    <div class="item"><img src="white-shirt.png" alt="White Tee"><p>White Tee</p></div>
+  </div>
+  <a class="btn" href="http://YOUR-EC2-PUBLIC-IP/index.php">View live catalog (EC2 + RDS)</a>
+</body>
+</html>
